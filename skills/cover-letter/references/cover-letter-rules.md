@@ -41,7 +41,42 @@ A cover letter is a short, specific argument for why this user, for this role, a
 - Don't list every skill the user has — pick 2.
 - Don't promise things the user can't back up.
 - Don't claim familiarity with company internals you haven't verified.
-- Don't use the phrases in `banned-phrases.md`.
+- Don't use the phrases in `../../../references/banned-phrases.md`.
+
+## Tense discipline
+
+The single most common AI tic in cover letters is wrong tense.
+
+- **Roles with end date "Present" on the resume** → that's the user's current role. Use present tense: *"I lead..."*, *"I own..."*.
+- **All other roles** → past role. Use past tense: *"I led..."*, *"I owned..."*. Even if the project was impressive, the user is not currently doing it.
+- **Never** describe a non-current role with phrases like "in my current role at {prior employer}" — that's an unforced factual error.
+
+If the resume is ambiguous about whether a role is current, default to past tense and surface the question to the user.
+
+## Company-attribution lock
+
+Every sentence that names a company must say something the resume attributes to THAT company's role + date range. Specifically:
+
+- **Don't merge metrics from different companies into one sentence.** If the user shipped X at Company A and grew Y at Company B, that's two sentences, not one. "I shipped X at Acme and grew Y by 40%" reads as if both happened at Acme.
+- **Don't use temporal connectors** ("earlier," "later," "before that") unless you have verified the chronology against the resume's date ranges. AI models invent timelines.
+- **Final pass before saving**: for every company name in the letter, read the corresponding role on the resume and confirm the cited achievement is right there. If it's not, fix the attribution or remove the sentence.
+
+## Sentence variation
+
+- No two consecutive sentences begin with the same word.
+- No two consecutive sentences follow the same structure (Subject-Verb-Object every time = robotic).
+- Mix short, punchy statements with one or two longer sentences. Variety reads as human; repetition reads as template.
+
+## Useful sentence starters (steal these)
+
+Templates that connect achievement to need without sounding AI:
+
+- "At {Company}, I {action} that {metric/outcome} — similar to what {target company}'s team is doing with {their thing}."
+- "My experience with {specific skill} directly relates to your need for {JD requirement}."
+- "The challenge you describe around {their stated problem} is one I {past action} at {prior employer}."
+- "When {prior company} faced {analogous problem}, I {what you did}; the result was {specific outcome}."
+
+Use these as scaffolding, then rewrite into the user's voice. Never paste verbatim across cover letters — same scaffolding sentence appearing in two cover letters is its own AI tell.
 
 ## Format
 

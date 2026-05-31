@@ -4,6 +4,12 @@ All notable changes to Side Door. Format: [Keep a Changelog](https://keepachange
 
 ## [Unreleased]
 
+## [0.4.2] — 2026-05-31
+
+- `cover-letter`: added tense discipline (past tense for past roles, present only for "Present" end date) and the company-attribution lock — every named company's cited achievement must trace back to that company's role + date range on the resume; never merge metrics from different employers into one sentence.
+- `cover-letter` Step 6: mandatory self-critique pass before saving (em dash scan, 25-word limit, read-aloud test, consecutive-sentence variation, banned-phrases sweep). "Last" / empty intent now defaults to the most recently modified job folder.
+- `references/banned-phrases.md`: added punctuation bans (em dash `—` and en dash `–` outright banned), plus sharper AI-tic phrases ("aligns perfectly", "living and breathing", "adopting processes", "I am excited about the opportunity").
+
 ## [0.4.1] — 2026-05-31
 
 - `tailor-resume`: new steps for narrative pitch (3.5), self-critique pass before saving (6.5), and profile feedback loop on user corrections (9).

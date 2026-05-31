@@ -12,9 +12,13 @@ You are writing one cover letter for one posting. Not the resume — that's `tai
 
 ## Step 1 — Locate the job folder
 
-Look for `side-door-workspace/jobs/<company>-<role>-<YYMM>/` for the target posting. If it doesn't exist, ask the user which posting they mean — likely they want to run `tailor-resume` first so the cover letter aligns with a tailored resume.
+Three modes — match the user's wording:
 
-If the user wants the cover letter standalone (no tailored resume), proceed — just read profile + posting directly and create the job folder yourself.
+- **"the last one" / "for that one" / empty intent / "write the cover letter"** → look at `side-door-workspace/jobs/` and pick the most recently modified folder. Confirm with the user in one line ("Writing the cover letter for {Company} — {Role} in {YYMM}, the one we tailored 12 min ago. OK?") before proceeding.
+- **A specific company or posting URL the user names** → find or create the matching `side-door-workspace/jobs/{company}-{role}-{YYMM}/` folder. If the posting is new, parse it like `tailor-resume` does (or invoke `tailor-resume` first if the resume isn't tailored yet — the cover letter aligns better when it does).
+- **Standalone (no tailored resume yet)** → proceed, but tell the user the letter will read better if `tailor-resume` runs first. Create the job folder yourself.
+
+If multiple recent folders exist and intent is ambiguous, list the 3 most recent and let the user pick.
 
 ## Step 2 — Read the substrate
 
@@ -57,7 +61,20 @@ Total: 250–400 words.
 
 Voice: first person, active. Plain language. No banned phrases (`../../references/banned-phrases.md`).
 
-## Step 6 — Output
+## Step 6 — Self-critique pass (mandatory before saving)
+
+Walk every sentence of the draft. For each, run these checks:
+
+1. **Em dash check.** Search the draft for `—` and `–`. Both are banned in this format. Replace with commas, periods, colons, semicolons, parentheses, or hyphens.
+2. **Sentence length.** Any sentence over 25 words → split or shorten.
+3. **Read-aloud test.** If a sentence takes more than one breath to read out loud, cut or split it.
+4. **Consecutive-sentence variation.** No two consecutive sentences begin with the same word or the same structure ("I led... I built... I shipped..." → vary).
+5. **Tense and attribution discipline** — see `references/cover-letter-rules.md` for the rules. Past roles in past tense; present tense ONLY for roles with end date "Present". Every company name has the cited achievement traceable to THAT company's role + date range on the resume — never merge metrics from different companies into one sentence. No "earlier" / "later" without checking resume dates first.
+6. **Banned-phrases sweep.** Grep the draft against `../../references/banned-phrases.md`. Zero tolerance — every banned phrase is replaced or cut.
+
+If any check fails, fix BEFORE saving the DOCX. The cover letter is short; a single AI-tic sentence can sink the whole document.
+
+## Step 7 — Output
 
 Save as DOCX using the `docx` skill: `<job-folder>/cover-letter.docx`.
 
@@ -66,7 +83,7 @@ Append to `<job-folder>/notes.md`:
 - Any fact in the letter the user should verify before sending.
 - Word count.
 
-## Step 7 — Brief the user
+## Step 8 — Brief the user
 
 Tell them, in 3–5 lines:
 

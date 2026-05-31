@@ -27,10 +27,22 @@ Phrases that mark a cover letter or resume as generic or AI-written. Do not use 
 - "at the intersection of"
 - "I am eager to contribute"
 - "I would relish the opportunity"
+- "I am excited about the opportunity"
+- "I am thrilled to apply"
 - "navigate the complexities of"
 - "drive impactful results"
 - "deliver value"
 - "spearhead transformative initiatives"
+- "aligns perfectly with"
+- "aligns seamlessly with"
+- "living and breathing {anything}"
+- "in line with what I observe"
+- "adopting {processes / methodologies / frameworks}"
+
+## Punctuation bans (cover letters and resume bullets)
+
+- **Em dash (`—`)** and **en dash (`–`)** — strongest AI tells. Replace with comma, period, colon, semicolon, parentheses, or hyphen (`-`). Hyphens are fine; dashes are not.
+- Curly quotes ("smart quotes") in plain-text drafts — fine in DOCX since Word handles them, but flag if pasted into a plain-text application form.
 
 ## Hollow openings
 - "Dear Sir/Madam" — use "Dear Hiring Team at {Company}" instead
