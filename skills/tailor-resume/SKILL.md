@@ -56,6 +56,16 @@ Healthcare regulatory exposure  -> Story "HIPAA Audit Lead" from stories bank   
 
 If multiple must-haves have "no proof", tell the user before tailoring — sometimes the answer is "this posting is a stretch, skip it".
 
+## Step 3.5 — Read the JD's level, then pick the narrative
+
+Before writing anything, do two things:
+
+1. **Read the JD's seniority band.** Use `references/level-calibration.md` to translate the JD's title + years + scope language into a band (executive / director / senior IC / mid / junior). If the user's actual band is one step higher or lower, flag it — the resume needs to bridge the gap honestly, and the cover letter does the rest of the work.
+
+2. **Write the narrative pitch — one sentence, then 2-3 supporting.** The hiring manager spends ~7 seconds on a first-pass scan. They should walk away with: *"This person is being hired as a {LEVEL} to {DO WHAT}, because {single strongest evidence from the user's history}."* Write that sentence out. Then the summary section of the resume becomes 2-3 short sentences that deliver exactly that pitch. If you can't write the pitch sentence honestly using only what's on the resume + profile, the tailoring is going to limp — surface that to the user before writing.
+
+Save the pitch sentence to `notes.md` later — it's the thesis the rest of the resume serves.
+
 ## Step 4 — ATS keyword diff
 
 Run a keyword diff between the JD's must-haves and the current resume. Bucket each must-have:
@@ -79,17 +89,37 @@ Ask these together. The user answers what they can; you fold the answers into th
 
 ## Step 6 — Tailor
 
-Read `references/resume-tailoring-rules.md` for the exact rewriting rules. Generate the tailored resume as a DOCX using the `docx` skill. Save to:
+Read `references/resume-tailoring-rules.md` for ATS-specific format rules and the bullet rewriting playbook. Read `references/anti-ai-writing.md` for the bullet formula, summary rules, per-role bullet counts, and the kill list of phrases that mark a resume as AI-written. Read `references/level-calibration.md` for the seniority-band emphasis. Generate the tailored resume as a DOCX using the `docx` skill — but DO NOT save it yet. Hold the draft in memory; Step 6.5 will critique it first.
 
-`side-door-workspace/jobs/<company-slug>-<role-slug>-<YYMM>/resume.docx`
+Target location (used in the next step):
 
-(Note: the folder name format is `<company>-<role>-<YYMM>` — `application-tracker` uses the same convention so logging joins cleanly.)
+`side-door-workspace/jobs/{company-slug}-{role-slug}-{YYMM}/resume.docx`
+
+(Note: the folder name format is `{company}-{role}-{YYMM}` — `application-tracker` uses the same convention so logging joins cleanly.)
+
+## Step 6.5 — Self-critique pass (mandatory before saving)
+
+Walk every sentence in the draft and apply the read-out-loud test: if a sentence takes more than one breath to read out loud, cut or split it. Apply the kill list from `references/anti-ai-writing.md` to every line:
+
+- No em dashes (this is the strongest AI tell).
+- No preamble clauses ("Leveraging deep expertise in X, led..." → "Led...").
+- No filler ("demonstrating ability to", "spanning", "leveraging", "utilizing", "with a track record of").
+- No stacked adjectives ("cross-functional, data-driven, customer-centric" → pick one + concrete example).
+- No gerund tacks ("...delivering Y while maintaining Z" → two sentences).
+- No compound noun piles ("AI-driven product opportunity identification" → "Built an AI product from idea to production").
+- No bullet longer than 2 lines.
+- No "led X, Y, and Z" piles (one action per bullet).
+- Action verbs varied within each role — not all "Led" or "Managed."
+
+Then check the quality checklist at the bottom of `anti-ai-writing.md`. Every box must be checked. Only after the critique pass is clean, save the DOCX to the target location.
 
 ## Step 7 — Save notes.md
 
 In the same job folder, write `notes.md`:
 
 - ATS and hiring path (from Step 1.5).
+- The seniority band you read from the JD + the user's actual band, with a flag if they don't match.
+- The narrative pitch sentence from Step 3.5 (the one-line thesis the resume serves).
 - The mapping table from Step 3.
 - The ATS keyword diff buckets from Step 4.
 - The metric-interrogation answers folded in.
@@ -103,6 +133,7 @@ This file is what `cover-letter` reads next.
 Tell them, in 3–5 lines:
 
 - Where the resume.docx was saved.
+- The narrative pitch (the one-line thesis from Step 3.5) — let them check the framing.
 - The mapping summary (X/Y must-haves matched, gaps).
 - The 2–3 most consequential edits.
 
@@ -111,6 +142,15 @@ Then offer:
 1. "Write the cover letter for this one" — invoke `cover-letter`.
 2. "Log this as `tailored, ready to apply` in the tracker" — invoke `application-tracker`.
 3. "Find more roles like this" — invoke `job-search`.
+
+## Step 9 — Sync corrections back to profile.md
+
+If the user pushes back on any factual detail during Step 8 ("actually I had revenue targets, not P&L"; "I led 3 people, not 30"; "we were a marketplace, not B2B SaaS"), do TWO things:
+
+1. Fix the resume.docx and notes.md immediately.
+2. Update `side-door-workspace/profile.md` so the correction persists — every downstream skill (cover-letter, interview-prep, next tailor-resume run) reads the corrected version.
+
+This is the feedback loop. Without it, the same mistake recurs on every future tailoring. Treat every correction as a permanent update to the profile, not a one-off fix.
 
 ## What this skill never does
 

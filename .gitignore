@@ -44,8 +44,9 @@ postings/
 patterns/
 interview-prep/
 
-# Build artifacts
+# Build artifacts — dev builds excluded, the bundled release artifact is allowed
 *.plugin
+!side-door.plugin
 *.zip
 /tmp/
 build/

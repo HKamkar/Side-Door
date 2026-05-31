@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+#
+# Pre-commit hook for side-door.
+#
+#   1. Validate .claude-plugin/plugin.json.
+#   2. Validate every skills/*/SKILL.md (frontmatter, name/dir match, no <>).
+#   3. Scan for accidental "career-copilot" references (the pre-rename name).
+#   4. If plugin.json version changed vs HEAD, rebuild side-door.plugin and stage it.
+#
+# Install by running ./scripts/install-hooks.sh once after cloning.
+# Requires: python3 (stdlib only), zip.
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "pre-commit: python3 required but not found." >&2
+  exit 1
+fi
+
+# ------------------------------------------------------------------
+# 1. Validate plugin.json
+# ------------------------------------------------------------------
+python3 <<'PY' || exit 1
+import json, re, sys
+try:
+    with open(".claude-plugin/plugin.json") as f:
+        m = json.load(f)
+except Exception as e:
+    print(f"pre-commit: .claude-plugin/plugin.json invalid JSON: {e}", file=sys.stderr); sys.exit(1)
+
+errors = []
+name = m.get("name", "")
+if not re.fullmatch(r"[a-z][a-z0-9-]*", name):
+    errors.append(f"name '{name}' must be kebab-case (lowercase letters/digits/hyphens)")
+if "version" not in m:
+    errors.append("missing 'version'")
+elif not re.fullmatch(r"\d+\.\d+\.\d+([+-].+)?", m["version"]):
+    errors.append(f"version '{m['version']}' is not semver (MAJOR.MINOR.PATCH)")
+if "description" not in m or not m["description"].strip():
+    errors.append("missing 'description'")
+elif "<" in m["description"] or ">" in m["description"]:
+    errors.append("description contains < or > — validator rejects these; use {placeholder}")
+if "license" in m:
+    errors.append("'license' field present — Cowork validator rejects unknown top-level fields; remove it (LICENSE file is enough)")
+
+if errors:
+    for e in errors:
+        print(f"pre-commit: plugin.json — {e}", file=sys.stderr)
+    sys.exit(1)
+PY
+
+# ------------------------------------------------------------------
+# 2. Validate every SKILL.md
+# ------------------------------------------------------------------
+python3 <<'PY' || exit 1
+import os, re, sys
+fail = False
+for d in sorted(os.listdir("skills")):
+    skill_dir = os.path.join("skills", d)
+    if not os.path.isdir(skill_dir):
+        continue
+    skill_md = os.path.join(skill_dir, "SKILL.md")
+    if not os.path.isfile(skill_md):
+        print(f"pre-commit: {skill_dir} — SKILL.md missing", file=sys.stderr); fail = True; continue
+    with open(skill_md) as f:
+        text = f.read()
+    fm = re.match(r"---\n(.*?)\n---\n", text, re.S)
+    if not fm:
+        print(f"pre-commit: {skill_md} — missing YAML frontmatter (--- ... ---)", file=sys.stderr); fail = True; continue
+    fm_text = fm.group(1)
+
+    # Minimal frontmatter parser (avoids requiring PyYAML).
+    name_m = re.search(r"^name:\s*(\S+)\s*$", fm_text, re.M)
+    if not name_m:
+        print(f"pre-commit: {skill_md} — frontmatter missing 'name'", file=sys.stderr); fail = True; continue
+    name = name_m.group(1)
+    if name != d:
+        print(f"pre-commit: {skill_md} — name '{name}' does not match folder '{d}'", file=sys.stderr); fail = True
+
+    # Description block can be `description: text` or `description: >\n  text...`
+    desc_m = re.search(r"^description:\s*(>?)\s*\n((?:[ \t]+.*\n)+)|^description:\s*(.+)$", fm_text, re.M)
+    if not desc_m:
+        print(f"pre-commit: {skill_md} — frontmatter missing 'description'", file=sys.stderr); fail = True; continue
+    desc = (desc_m.group(2) or desc_m.group(3) or "").strip()
+    if not desc:
+        print(f"pre-commit: {skill_md} — empty description", file=sys.stderr); fail = True; continue
+    if "<" in desc or ">" in desc:
+        print(f"pre-commit: {skill_md} — description contains < or > — validator rejects these; use {{placeholder}}", file=sys.stderr); fail = True
+
+    # Length sanity (SKILL.md bodies should stay reasonable).
+    body = text[fm.end():]
+    word_count = len(body.split())
+    if word_count > 5000:
+        print(f"pre-commit: {skill_md} — body is {word_count} words; move detail into references/", file=sys.stderr); fail = True
+
+if fail:
+    sys.exit(1)
+PY
+
+# ------------------------------------------------------------------
+# 3. Scan for accidental "career-copilot" references (pre-rename name)
+# ------------------------------------------------------------------
+stray=$(grep -rln "career-copilot" . \
+    --exclude-dir=.git \
+    --exclude-dir=.idea \
+    --exclude-dir=git-hooks \
+    --exclude=side-door.plugin \
+    --exclude="*.zip" \
+    --exclude=CHANGELOG.md 2>/dev/null || true)
+if [ -n "$stray" ]; then
+  echo "pre-commit: found 'career-copilot' references (plugin was renamed to 'side-door'):" >&2
+  echo "$stray" | sed 's/^/  /' >&2
+  echo "  (CHANGELOG.md and scripts/git-hooks/ are exempt — they reference the rename intentionally)" >&2
+  exit 1
+fi
+
+# ------------------------------------------------------------------
+# 4. If plugin.json version changed, rebuild side-door.plugin and stage it
+# ------------------------------------------------------------------
+current_version="$(python3 -c 'import json; print(json.load(open(".claude-plugin/plugin.json"))["version"])')"
+committed_version="$(git show HEAD:.claude-plugin/plugin.json 2>/dev/null \
+  | python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])' 2>/dev/null || true)"
+
+if [ "$current_version" != "$committed_version" ]; then
+  if ! command -v zip >/dev/null 2>&1; then
+    echo "pre-commit: version changed ($committed_version -> $current_version) but 'zip' not found; install zip to auto-rebuild." >&2
+    exit 1
+  fi
+  echo "pre-commit: version changed ($committed_version -> $current_version); rebuilding side-door.plugin..."
+  rm -f side-door.plugin
+  zip -rq side-door.plugin . \
+    -x "*.DS_Store" \
+    -x ".git/*" \
+    -x ".idea/*" \
+    -x "side-door.plugin" \
+    -x "scripts/*"
+  git add side-door.plugin
+  echo "pre-commit: side-door.plugin rebuilt and staged."
+fi
+
+exit 0

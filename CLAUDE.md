@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-`side-door` is a Claude Code plugin that runs an end-to-end job-search workflow: resume profile → search → tailor → cover letter → interview prep → tracker. The README sometimes calls the host "Cowork"; treat that as a typo — this is a Claude Code plugin. Distributed as a `.plugin` zip; no build system, no tests, no CI.
+`side-door` is a plugin for **Cowork** (Anthropic's desktop app built on Claude Code) that runs an end-to-end job-search workflow: setup interview → resume profile → search → tailor → cover letter → network scan → interview prep → tracker. The plugin format (`.claude-plugin/`, `skills/`, `references/`) is shared between Cowork and Claude Code, so it also works in Claude Code. Distributed as a `.plugin` zip; no build system, no tests, no CI.
 
 ## Repo layout
 
-- `.claude-plugin/plugin.json` — minimal manifest (name, version, author, keywords). Skills auto-discover from `skills/`; do NOT list them here.
-- `skills/<name>/SKILL.md` — one folder per skill. **Folder name must match the `name:` in the frontmatter** (currently true for all 10 skills; the `skill-creator` validator enforces this).
-- `references/*.md` — cross-cutting lookup tables shared by multiple skills. When two skills need the same data (ATS detection, scoring rubric, banned phrases), put it here instead of duplicating.
+- `.claude-plugin/plugin.json` — minimal manifest (name, version, author, keywords). Skills auto-discover from `skills/`; do NOT list them here. The validator rejects unknown top-level fields like `license`, so keep the manifest tight.
+- `skills/<name>/SKILL.md` — one folder per skill. **Folder name must match the `name:` in the frontmatter** (the `skill-creator` validator enforces this). Frontmatter descriptions must not contain `<` or `>` — use `{placeholder}` instead.
+- `references/*.md` — cross-cutting lookup tables shared by multiple skills (ATS detection, fit scoring, banned phrases). Don't duplicate this content inside individual skills.
 
 ## Design invariants — preserve when editing any skill
 
@@ -29,5 +29,6 @@ All user state lives in `side-door-workspace/` in the user's CWD (profile, posti
 
 ## Build and validate
 
-- Build the distributable: `zip -r side-door.plugin . -x "*.DS_Store" -x ".git/*"`
-- Validate a skill before submitting: `python3 .claude/skills/skill-creator/scripts/quick_validate.py skills/<name>/` — requires the `skill-creator` plugin installed separately.
+- **Install the pre-commit hook once** after cloning: `./scripts/install-hooks.sh`. The hook (at `scripts/git-hooks/pre-commit`) validates `plugin.json` + every `SKILL.md` + scans for leftover pre-rename references on every commit, and **rebuilds `side-door.plugin` automatically when the version in `plugin.json` changes** (so the bundled artifact never drifts from source). The hook excludes `scripts/`, `.git/`, `.idea/`, `.DS_Store` and the prior `side-door.plugin` itself from the zip.
+- **Manual rebuild** (if you skip the hook): `zip -r side-door.plugin . -x "*.DS_Store" -x ".git/*" -x ".idea/*" -x "scripts/*" -x "side-door.plugin"`.
+- **External validator** (deeper checks): if you have the `skill-creator` plugin installed, `python3 <path-to-skill-creator>/scripts/quick_validate.py skills/<name>/` does the same frontmatter / dir-match / `<>`-rejection checks plus body-length limits.

@@ -21,7 +21,7 @@ The router skill picks the right specialist.
 
 ## Install
 
-1. Download `side-door.plugin` from [Releases](../../releases) (or build it yourself: `zip -r side-door.plugin . -x "*.DS_Store" -x ".git/*"`).
+1. Grab [`side-door.plugin`](side-door.plugin) from this repo. (Or rebuild from source: `zip -r side-door.plugin . -x "*.DS_Store" -x ".git/*" -x ".idea/*" -x "side-door.plugin"`.)
 2. In Cowork, install the `.plugin` file.
 3. Open a folder you want to use for job hunting and start with: **"set me up"**.
 
@@ -96,7 +96,19 @@ The plugin is a productivity tool. Hiring decisions, salary negotiations, and vi
 
 ## Contributing
 
-PRs welcome. Each skill is a self-contained folder under `skills/` with one `SKILL.md` and optional `references/`. Run `python3 .claude/skills/skill-creator/scripts/quick_validate.py skills/<your-skill>/` before submitting.
+PRs welcome. Each skill is a self-contained folder under `skills/` with one `SKILL.md` and optional `references/`.
+
+After cloning, install the git hooks once:
+
+```bash
+./scripts/install-hooks.sh
+```
+
+The pre-commit hook validates `plugin.json` and every `SKILL.md` (frontmatter, name/folder match, no `<` or `>` in descriptions, no leftover references to the plugin's pre-rename name). When you bump the version in `plugin.json`, it rebuilds and stages `side-door.plugin` automatically.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## License
 
