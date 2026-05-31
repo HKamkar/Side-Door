@@ -4,6 +4,10 @@ All notable changes to Side Door. Format: [Keep a Changelog](https://keepachange
 
 ## [Unreleased]
 
+## [0.4.3] — 2026-05-31
+
+- **Fix**: `skills/interview-prep/` (SKILL.md + 4 references) was silently excluded from every previous build. The unanchored `interview-prep/` pattern in `.gitignore` — intended for the workspace subfolder — also matched the skill folder, so git never tracked it. Anchored the workspace-folder patterns (`jobs/`, `postings/`, `patterns/`, `interview-prep/`) to repo root with a leading `/` so they only ignore stray data at the root.
+
 ## [0.4.2] — 2026-05-31
 
 - `cover-letter`: added tense discipline (past tense for past roles, present only for "Present" end date) and the company-attribution lock — every named company's cited achievement must trace back to that company's role + date range on the resume; never merge metrics from different employers into one sentence.

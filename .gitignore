@@ -39,10 +39,12 @@ application-data.md
 shortlist.md
 network-matches.md
 Connections.csv
-jobs/
-postings/
-patterns/
-interview-prep/
+# Anchored to repo root: these are workspace subfolder names that also collide
+# with skill/reference paths (e.g. skills/interview-prep/) if left unanchored.
+/jobs/
+/postings/
+/patterns/
+/interview-prep/
 
 # Build artifacts — dev builds excluded, the bundled release artifact is allowed
 *.plugin
