@@ -1,0 +1,52 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Linux
+*~
+.directory
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude Code per-user settings (project-level shared settings can be committed)
+.claude/settings.local.json
+
+# Python (in case anyone adds scripts later)
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Node
+node_modules/
+
+# User data — side-door writes here when installed; should never be in the plugin source
+side-door-workspace/
+applications.csv
+profile.md
+preferences.md
+application-data.md
+shortlist.md
+network-matches.md
+Connections.csv
+jobs/
+postings/
+patterns/
+interview-prep/
+
+# Build artifacts
+*.plugin
+*.zip
+/tmp/
+build/
+dist/

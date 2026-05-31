@@ -1,0 +1,9 @@
+{
+  "name": "side-door",
+  "version": "0.4.0",
+  "description": "Get hired through the side door — warm intros, honest tailoring.",
+  "author": {
+    "name": "HKamkar"
+  },
+  "keywords": ["job-search", "resume", "interview", "career", "cover-letter"]
+}
